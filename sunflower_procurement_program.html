@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Программа расчета закупки подсолнечника</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            background: #f8f9fa;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .label-info {
+            font-weight: 400;
+            color: #666;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .results {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+            color: white;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .result-value {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .breakdown {
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+
+        .breakdown-item {
+            padding: 5px 0;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #856404;
+        }
+
+        .error {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #721c24;
+        }
+
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #155724;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .total-row {
+            background: #f8f9fa;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 8px;
+            }
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .recipient-info {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .recipient-info h4 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .recipient-info p {
+            margin: 5px 0;
+            font-size: 13px;
+            color: #424242;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌻 Программа расчета закупки подсолнечника</h1>
+            <p>Комплексная система управления закупками с учетом показателей качества</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('calculator')">📊 Калькулятор</button>
+            <button class="tab" onclick="switchTab('history')">📋 История расчетов</button>
+            <button class="tab" onclick="switchTab('recipients')">🏢 Грузополучатели</button>
+            <button class="tab" onclick="switchTab('stats')">📈 Статистика</button>
+        </div>
+
+        <!-- Калькулятор -->
+        <div id="calculator" class="tab-content active">
+            <div class="input-section">
+                <div class="section-title">🏢 Информация о поставке</div>
+                
+                <div class="grid-2">
+                    <div class="input-group">
+                        <label>Грузополучатель</label>
+                        <select id="recipient">
+                            <option value="">Выберите грузополучателя</option>
+                            <option value="barnaul">ООО «Благо-Барнаул»</option>
+                            <option value="biysk">ООО «Благо-Бийск»</option>
+                            <option value="omsk">ООО «Благо-Омск»</option>
+                            <option value="hava">ООО «Благо-Верхняя Хава»</option>
+                            <option value="ertil">ООО «Благо-Эртиль»</option>
+                            <option value="armavir">ООО «Благо-Армавир»</option>
+                            <option value="don">ОП ООО «Благо-Дон»</option>
+                            <option value="yug">ОП ООО "Благо-юг"</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Номер ТС / Вагона</label>
+                        <input type="text" id="vehicleNumber" placeholder="Введите номер">
+                    </div>
+                </div>
+
+                <div id="recipientInfo" class="recipient-info" style="display: none;"></div>
+            </div>
+
+            <div class="input-section">
+                <div class="section-title">💰 Базовая информация</div>
+                <div class="grid-3">
+                    <div class="input-group">
+                        <label>Базовая цена за 1 кг (руб.)</label>
+                        <input type="number" id="basePrice" step="0.01" value="30.00" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label>Вес партии (кг)</label>
+                        <input type="number" id="weight" step="1" value="1000" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label>Дата поставки</label>
+                        <input type="date" id="deliveryDate">
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <div class="section-title">🔬 Показатели качества</div>
+                
+                <div class="grid-2">
+                    <div class="input-group">
+                        <label>
+                            Массовая доля влаги, %
+                            <span class="label-info">(базис: 8%, допустимо: 5-18%)</span>
+                        </label>
+                        <input type="number" id="moisture" step="0.01" value="8.00" min="0" max="100">
+                    </div>
+
+                    <div class="input-group">
+                        <label>
+                            Сорная примесь, %
+                            <span class="label-info">(базис: 3%, допустимо: до 18%)</span>
+                        </label>
+                        <input type="number" id="impurity" step="0.01" value="3.00" min="0" max="100">
+                    </div>
+
+                    <div class="input-group">
+                        <label>
+                            Кислотное число масла, мг КОН/г
+                            <span class="label-info">(базис: 3.0, допустимо: до 4.0)</span>
+                        </label>
+                        <input type="number" id="acidNumber" step="0.01" value="3.00" min="0">
+                    </div>
+
+                    <div class="input-group">
+                        <label>
+                            Масличная примесь, %
+                            <span class="label-info">(допустимо: до 12%)</span>
+                        </label>
+                        <input type="number" id="oilImpurity" step="0.01" value="0.00" min="0" max="100">
+                    </div>
+
+                    <div class="input-group">
+                        <label>
+                            Массовая доля масла в сухом веществе, %
+                            <span class="label-info">(базис: 45%, допустимо: от 40%)</span>
+                        </label>
+                        <input type="number" id="oilContent" step="0.01" value="45.00" min="0" max="100">
+                    </div>
+                </div>
+
+                <div id="warnings"></div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary btn-block" onclick="calculate()">🧮 Рассчитать стоимость</button>
+            </div>
+
+            <div id="results" style="display: none;"></div>
+
+            <div class="button-group" id="saveButtons" style="display: none;">
+                <button class="btn btn-success" onclick="saveCalculation()">💾 Сохранить расчет</button>
+                <button class="btn btn-secondary" onclick="resetForm()">🔄 Новый расчет</button>
+            </div>
+        </div>
+
+        <!-- История расчетов -->
+        <div id="history" class="tab-content">
+            <div class="input-section">
+                <div class="section-title">📋 Все расчеты</div>
+                <div class="button-group">
+                    <button class="btn btn-success" onclick="exportToExcel()">📥 Экспорт в Excel</button>
+                    <button class="btn btn-danger" onclick="clearHistory()">🗑️ Очистить историю</button>
+                </div>
+            </div>
+            <div id="historyTable"></div>
+        </div>
+
+        <!-- Грузополучатели -->
+        <div id="recipients" class="tab-content">
+            <div class="input-section">
+                <div class="section-title">🏢 Информация о грузополучателях</div>
+                <div id="recipientsList"></div>
+            </div>
+        </div>
+
+        <!-- Статистика -->
+        <div id="stats" class="tab-content">
+            <div class="input-section">
+                <div class="section-title">📈 Общая статистика</div>
+                <div class="grid-3">
+                    <div class="stat-card">
+                        <div class="stat-label">Всего расчетов</div>
+                        <div class="stat-value" id="totalCalculations">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Общий вес (т)</div>
+                        <div class="stat-value" id="totalWeight">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Общая сумма (руб)</div>
+                        <div class="stat-value" id="totalAmount">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="input-section">
+                <div class="section-title">📊 Средние показатели качества</div>
+                <div id="avgQuality"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const recipients = {
+            barnaul: {
+                name: 'ООО «Благо-Барнаул»',
+                inn: '2223624670',
+                address: '656922, Алтайский край, город Барнаул, улица Трактовая, дом 3Д, помещение 1',
+                station: 'Барнаул (840109)'
+            },
+            biysk: {
+                name: 'ООО «Благо-Бийск»',
+                inn: '2204087042',
+                address: '659305, Алтайский край, город Бийск, улица имени Героя Советского Союза Трофимова, дом 26, помещение 1',
+                station: '--'
+            },
+            omsk: {
+                name: 'ООО «Благо-Омск»',
+                inn: '5504155010',
+                address: '646800, Омская область, район Таврический, р.п. Таврическое, улица Аграрная, дом 1, пом. 1',
+                station: 'Стрела (834502)'
+            },
+            hava: {
+                name: 'ООО «Благо-Верхняя Хава»',
+                inn: '2310165912',
+                address: '396110, Воронежская область, Верхнехавский р-н, с. Верхняя Хава, ул. Железнодорожная, д. 120',
+                station: 'Хава (590800)'
+            },
+            ertil: {
+                name: 'ООО «Благо-Эртиль»',
+                inn: '2312196715',
+                address: '397033, Воронежская обл., р-н Эртильский, г. Эртиль, ул. Феоктистова, 21А, офис 1',
+                station: '--'
+            },
+            armavir: {
+                name: 'ООО «Благо-Армавир»',
+                inn: '7816455333',
+                address: '352900, Краснодарский край, г. Армавир, ул. Воровского, д. 57',
+                station: 'Армавир-Туапсинский (530301)',
+                restrictions: 'Не допускается поставка семян с сорной примесью от 10,1% до 15% в количестве более 200 тн/сутки, сорной примесью и/или влажностью более 15%'
+            },
+            don: {
+                name: 'ОП ООО «Благо-Дон»',
+                inn: '6162087831',
+                address: '347780, Ростовская область, п. Веселый, ул. Октябрьская, д.1в',
+                station: '--'
+            },
+            yug: {
+                name: 'ОП ООО "Благо-юг"',
+                inn: '--',
+                address: 'Воронежская область, Аннинский район, п.г.т. Анна, ул. Энгельса, д. 1',
+                station: 'Анна (59120)'
+            }
+        };
+
+        let calculations = JSON.parse(localStorage.getItem('calculations') || '[]');
+
+        // Показ информации о грузополучателе
+        document.getElementById('recipient').addEventListener('change', function() {
+            const recipientInfo = document.getElementById('recipientInfo');
+            const value = this.value;
+            
+            if (value && recipients[value]) {
+                const r = recipients[value];
+                let html = `
+                    <h4>${r.name}</h4>
+                    <p><strong>ИНН:</strong> ${r.inn}</p>
+                    <p><strong>Адрес:</strong> ${r.address}</p>
+                    <p><strong>ЖД станция:</strong> ${r.station}</p>
+                `;
+                if (r.restrictions) {
+                    html += `<p style="color: #d32f2f; margin-top: 10px;"><strong>⚠️ Ограничения:</strong> ${r.restrictions}</p>`;
+                }
+                recipientInfo.innerHTML = html;
+                recipientInfo.style.display = 'block';
+            } else {
+                recipientInfo.style.display = 'none';
+            }
+        });
+
+        // Установка сегодняшней даты
+        document.getElementById('deliveryDate').valueAsDate = new Date();
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            if (tabName === 'history') {
+                displayHistory();
+            } else if (tabName === 'recipients') {
+                displayRecipients();
+            } else if (tabName === 'stats') {
+                displayStats();
+            }
+        }
+
+        function calculate() {
+            const basePrice = parseFloat(document.getElementById('basePrice').value) || 0;
+            const weight = parseFloat(document.getElementById('weight').value) || 0;
+            const moisture = parseFloat(document.getElementById('moisture').value) || 0;
+            const impurity = parseFloat(document.getElementById('impurity').value) || 0;
+            const acidNumber = parseFloat(document.getElementById('acidNumber').value) || 0;
+            const oilImpurity = parseFloat(document.getElementById('oilImpurity').value) || 0;
+            const oilContent = parseFloat(document.getElementById('oilContent').value) || 0;
+            const recipient = document.getElementById('recipient').value;
+            const vehicleNumber = document.getElementById('vehicleNumber').value;
+
+            let warnings = [];
+            let errors = [];
+            let totalDiscount = 0;
+            let breakdown = [];
+
+            // Проверка специальных ограничений для Армавира
+            if (recipient === 'armavir') {
+                if (impurity >= 10.1 && impurity <= 15 && weight > 200000) {
+                    errors.push('Для грузополучателя Армавир не допускается поставка семян с сорной примесью от 10,1% до 15% в количестве более 200 тн/сутки');
+                }
+                if (impurity > 15 || moisture > 15) {
+                    errors.push('Для грузополучателя Армавир не допускается сорная примесь и/или влажность более 15%');
+                }
+            }
+
+            // Критические ограничения
+            if (oilImpurity > 12) {
+                errors.push('Масличная примесь превышает допустимые 12%');
+            }
+
+            // Расчет скидок по влажности
+            if (moisture > 8.01) {
+                let moistureDiscount = 0;
+                if (moisture <= 12.0) {
+                    moistureDiscount = (moisture - 8.0) * 1.0;
+                    breakdown.push(`Влажность ${moisture.toFixed(2)}%: -${moistureDiscount.toFixed(2)}% (1% за каждый % от 8.01 до 12.0)`);
+                } else if (moisture <= 15.0) {
+                    moistureDiscount = (12.0 - 8.0) * 1.0 + (moisture - 12.0) * 1.5;
+                    breakdown.push(`Влажность ${moisture.toFixed(2)}%: -${moistureDiscount.toFixed(2)}% (1% за 8.01-12.0, 1.5% за 12.01-15.0)`);
+                } else if (moisture <= 18.0) {
+                    moistureDiscount = (12.0 - 8.0) * 1.0 + (15.0 - 12.0) * 1.5 + (moisture - 15.0) * 2.0;
+                    breakdown.push(`Влажность ${moisture.toFixed(2)}%: -${moistureDiscount.toFixed(2)}% (1% за 8.01-12.0, 1.5% за 12.01-15.0, 2% за 15.01-18.0)`);
+                } else {
+                    moistureDiscount = (12.0 - 8.0) * 1.0 + (15.0 - 12.0) * 1.5 + (18.0 - 15.0) * 2.0 + (moisture - 18.0) * 4.0;
+                    warnings.push('Влажность превышает максимально допустимые 18% (скидка 4% за каждый % превышения)');
+                    breakdown.push(`Влажность ${moisture.toFixed(2)}%: -${moistureDiscount.toFixed(2)}% (превышение макс. допустимого)`);
+                }
+                totalDiscount += moistureDiscount;
+            } else if (moisture < 5.0) {
+                const moistureDiscount = (5.0 - moisture) * 4.0;
+                warnings.push('Влажность ниже минимально допустимых 5% (скидка 4% за каждый % понижения)');
+                breakdown.push(`Влажность ${moisture.toFixed(2)}%: -${moistureDiscount.toFixed(2)}%`);
+                totalDiscount += moistureDiscount;
+            }
+
+            // Расчет скидок по сорной примеси
+            if (impurity > 3.01) {
+                let impurityDiscount = 0;
+                if (impurity <= 8.0) {
+                    impurityDiscount = (impurity - 3.0) * 1.0;
+                    breakdown.push(`Сорная примесь ${impurity.toFixed(2)}%: -${impurityDiscount.toFixed(2)}% (1% за каждый % от 3.01 до 8.0)`);
+                } else if (impurity <= 10.0) {
+                    impurityDiscount = (8.0 - 3.0) * 1.0 + (impurity - 8.0) * 1.5;
+                    breakdown.push(`Сорная примесь ${impurity.toFixed(2)}%: -${impurityDiscount.toFixed(2)}% (1% за 3.01-8.0, 1.5% за 8.01-10.0)`);
+                } else if (impurity <= 18.0) {
+                    impurityDiscount = (8.0 - 3.0) * 1.0 + (10.0 - 8.0) * 1.5 + (impurity - 10.0) * 2.0;
+                    breakdown.push(`Сорная примесь ${impurity.toFixed(2)}%: -${impurityDiscount.toFixed(2)}% (1% за 3.01-8.0, 1.5% за 8.01-10.0, 2% за 10.01-18.0)`);
+                } else {
+                    impurityDiscount = (8.0 - 3.0) * 1.0 + (10.0 - 8.0) * 1.5 + (18.0 - 10.0) * 2.0 + (impurity - 18.0) * 4.0;
+                    warnings.push('Сорная примесь превышает максимально допустимые 18% (скидка 4% за каждый % превышения)');
+                    breakdown.push(`Сорная примесь ${impurity.toFixed(2)}%: -${impurityDiscount.toFixed(2)}% (превышение макс. допустимого)`);
+                }
+                totalDiscount += impurityDiscount;
+            }
+
+            // Расчет скидок по кислотному числу
+            if (acidNumber > 3.01) {
+                if (acidNumber <= 4.0) {
+                    const acidDiscount = (acidNumber - 3.0) * 2.0;
+                    breakdown.push(`Кислотное число ${acidNumber.toFixed(2)}: -${acidDiscount.toFixed(2)}% (2% за каждую единицу от 3.01 до 4.0)`);
+                    totalDiscount += acidDiscount;
+                } else {
+                    const acidDiscount = (4.0 - 3.0) * 2.0 + (acidNumber - 4.0) * 4.0;
+                    warnings.push('Кислотное число превышает максимально допустимое 4.0 (скидка 4% за каждую единицу превышения)');
+                    breakdown.push(`Кислотное число ${acidNumber.toFixed(2)}: -${acidDiscount.toFixed(2)}% (превышение макс. допустимого)`);
+                    totalDiscount += acidDiscount;
+                }
+            }
+
+            // Расчет скидок по массовой доле масла
+            if (oilContent < 44.99) {
+                let oilDiscount = 0;
+                if (oilContent >= 43.0) {
+                    oilDiscount = (45.0 - oilContent) * 2.0;
+                    breakdown.push(`Массовая доля масла ${oilContent.toFixed(2)}%: -${oilDiscount.toFixed(2)}% (2% за каждый % от 44.99 до 43.0)`);
+                } else if (oilContent >= 40.0) {
+                    oilDiscount = (45.0 - 43.0) * 2.0 + (43.0 - oilContent) * 3.0;
+                    breakdown.push(`Массовая доля масла ${oilContent.toFixed(2)}%: -${oilDiscount.toFixed(2)}% (2% за 44.99-43.0, 3% за 42.99-40.0)`);
+                } else {
+                    oilDiscount = (45.0 - 43.0) * 2.0 + (43.0 - 40.0) * 3.0 + (40.0 - oilContent) * 4.0;
+                    warnings.push('Массовая доля масла ниже минимально допустимых 40% (скидка 4% за каждый % понижения)');
+                    breakdown.push(`Массовая доля масла ${oilContent.toFixed(2)}%: -${oilDiscount.toFixed(2)}% (ниже мин. допустимого)`);
+                }
+                totalDiscount += oilDiscount;
+            }
+
+            // Вывод предупреждений
+            const warningsDiv = document.getElementById('warnings');
+            warningsDiv.innerHTML = '';
+            
+            errors.forEach(error => {
+                warningsDiv.innerHTML += `<div class="error">❌ ${error}</div>`;
+            });
+
+            warnings.forEach(warning => {
+                warningsDiv.innerHTML += `<div class="warning">⚠️ ${warning}</div>`;
+            });
+
+            // Расчет финальной цены
+            const discountMultiplier = 1 - (totalDiscount / 100);
+            const finalPricePerKg = basePrice * discountMultiplier;
+            const totalCost = finalPricePerKg * weight;
+
+            // Сохранение данных расчета для последующего сохранения
+            window.currentCalculation = {
+                date: document.getElementById('deliveryDate').value,
+                recipient: recipient,
+                recipientName: recipient ? recipients[recipient].name : 'Не указан',
+                vehicleNumber: vehicleNumber || 'Не указан',
+                basePrice: basePrice,
+                weight: weight,
+                moisture: moisture,
+                impurity: impurity,
+                acidNumber: acidNumber,
+                oilImpurity: oilImpurity,
+                oilContent: oilContent,
+                totalDiscount: totalDiscount,
+                finalPricePerKg: finalPricePerKg,
+                totalCost: totalCost,
+                breakdown: breakdown,
+                warnings: warnings,
+                errors: errors
+            };
+
+            // Вывод результатов
+            const resultsDiv = document.getElementById('results');
+            
+            let resultsHTML = '<div class="results">';
+            resultsHTML += '<h3 style="margin-bottom: 15px;">Результаты расчета</h3>';
+            resultsHTML += `
+                <div class="result-item">
+                    <span class="result-label">Базовая цена за 1 кг:</span>
+                    <span class="result-value">${basePrice.toFixed(2)} руб.</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Общая скидка:</span>
+                    <span class="result-value">${totalDiscount.toFixed(2)}%</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Итоговая цена за 1 кг:</span>
+                    <span class="result-value">${finalPricePerKg.toFixed(2)} руб.</span>
+                </div>
+                <div class="result-item" style="font-size: 18px; font-weight: 700; padding-top: 15px;">
+                    <span class="result-label">Стоимость партии (${weight.toLocaleString('ru-RU')} кг):</span>
+                    <span class="result-value">${totalCost.toLocaleString('ru-RU', {minimumFractionDigits: 2, maximumFractionDigits: 2})} руб.</span>
+                </div>
+            `;
+
+            if (breakdown.length > 0) {
+                resultsHTML += '<div class="breakdown"><strong>Детализация скидок:</strong>';
+                breakdown.forEach(item => {
+                    resultsHTML += `<div class="breakdown-item">• ${item}</div>`;
+                });
+                resultsHTML += '</div>';
+            }
+
+            resultsHTML += '</div>';
+
+            resultsDiv.innerHTML = resultsHTML;
+            resultsDiv.style.display = 'block';
+            
+            if (errors.length === 0) {
+                document.getElementById('saveButtons').style.display = 'flex';
+            } else {
+                document.getElementById('saveButtons').style.display = 'none';
+            }
+        }
+
+        function saveCalculation() {
+            if (!window.currentCalculation) {
+                alert('Сначала выполните расчет');
+                return;
+            }
+
+            calculations.push({
+                ...window.currentCalculation,
+                id: Date.now(),
+                savedAt: new Date().toISOString()
+            });
+
+            localStorage.setItem('calculations', JSON.stringify(calculations));
+            
+            const successDiv = document.getElementById('warnings');
+            successDiv.innerHTML = '<div class="success">✅ Расчет успешно сохранен в истории!</div>' + successDiv.innerHTML;
+            
+            setTimeout(() => {
+                const successMsg = successDiv.querySelector('.success');
+                if (successMsg) successMsg.remove();
+            }, 3000);
+        }
+
+        function resetForm() {
+            document.getElementById('basePrice').value = '30.00';
+            document.getElementById('weight').value = '1000';
+            document.getElementById('moisture').value = '8.00';
+            document.getElementById('impurity').value = '3.00';
+            document.getElementById('acidNumber').value = '3.00';
+            document.getElementById('oilImpurity').value = '0.00';
+            document.getElementById('oilContent').value = '45.00';
+            document.getElementById('recipient').value = '';
+            document.getElementById('vehicleNumber').value = '';
+            document.getElementById('recipientInfo').style.display = 'none';
+            document.getElementById('warnings').innerHTML = '';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('saveButtons').style.display = 'none';
+            window.currentCalculation = null;
+        }
+
+        function displayHistory() {
+            const historyTable = document.getElementById('historyTable');
+            
+            if (calculations.length === 0) {
+                historyTable.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <h3>История расчетов пуста</h3>
+                        <p>Сохраненные расчеты будут отображаться здесь</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let totalWeight = 0;
+            let totalAmount = 0;
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Грузополучатель</th>
+                            <th>ТС/Вагон</th>
+                            <th>Вес (кг)</th>
+                            <th>Цена/кг</th>
+                            <th>Скидка</th>
+                            <th>Сумма</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            calculations.slice().reverse().forEach(calc => {
+                totalWeight += calc.weight;
+                totalAmount += calc.totalCost;
+
+                html += `
+                    <tr>
+                        <td>${new Date(calc.date).toLocaleDateString('ru-RU')}</td>
+                        <td>${calc.recipientName}</td>
+                        <td>${calc.vehicleNumber}</td>
+                        <td>${calc.weight.toLocaleString('ru-RU')}</td>
+                        <td>${calc.finalPricePerKg.toFixed(2)} ₽</td>
+                        <td>${calc.totalDiscount.toFixed(2)}%</td>
+                        <td>${calc.totalCost.toLocaleString('ru-RU', {minimumFractionDigits: 2})} ₽</td>
+                        <td>
+                            <button class="action-btn btn-primary" onclick="viewDetails(${calc.id})">👁️</button>
+                            <button class="action-btn btn-danger" onclick="deleteCalculation(${calc.id})">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    <tr class="total-row">
+                        <td colspan="3"><strong>ИТОГО:</strong></td>
+                        <td><strong>${totalWeight.toLocaleString('ru-RU')}</strong></td>
+                        <td colspan="2"></td>
+                        <td><strong>${totalAmount.toLocaleString('ru-RU', {minimumFractionDigits: 2})} ₽</strong></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+                </table>
+            `;
+
+            historyTable.innerHTML = html;
+        }
+
+        function viewDetails(id) {
+            const calc = calculations.find(c => c.id === id);
+            if (!calc) return;
+
+            let details = `
+ДЕТАЛИ РАСЧЕТА
+
+Дата поставки: ${new Date(calc.date).toLocaleDateString('ru-RU')}
+Грузополучатель: ${calc.recipientName}
+ТС/Вагон: ${calc.vehicleNumber}
+
+БАЗОВАЯ ИНФОРМАЦИЯ:
+• Базовая цена: ${calc.basePrice.toFixed(2)} руб/кг
+• Вес партии: ${calc.weight.toLocaleString('ru-RU')} кг
+
+ПОКАЗАТЕЛИ КАЧЕСТВА:
+• Влажность: ${calc.moisture}%
+• Сорная примесь: ${calc.impurity}%
+• Кислотное число: ${calc.acidNumber} мг КОН/г
+• Масличная примесь: ${calc.oilImpurity}%
+• Массовая доля масла: ${calc.oilContent}%
+
+РАСЧЕТ:
+• Общая скидка: ${calc.totalDiscount.toFixed(2)}%
+• Итоговая цена за кг: ${calc.finalPricePerKg.toFixed(2)} руб
+• Общая стоимость: ${calc.totalCost.toLocaleString('ru-RU', {minimumFractionDigits: 2})} руб
+
+ДЕТАЛИЗАЦИЯ СКИДОК:
+${calc.breakdown.map(b => '• ' + b).join('\n')}
+            `;
+
+            alert(details);
+        }
+
+        function deleteCalculation(id) {
+            if (confirm('Удалить этот расчет из истории?')) {
+                calculations = calculations.filter(c => c.id !== id);
+                localStorage.setItem('calculations', JSON.stringify(calculations));
+                displayHistory();
+            }
+        }
+
+        function clearHistory() {
+            if (confirm('Удалить всю историю расчетов? Это действие нельзя отменить!')) {
+                calculations = [];
+                localStorage.setItem('calculations', JSON.stringify(calculations));
+                displayHistory();
+            }
+        }
+
+        function exportToExcel() {
+            if (calculations.length === 0) {
+                alert('Нет данных для экспорта');
+                return;
+            }
+
+            let csv = 'Дата;Грузополучатель;ТС/Вагон;Вес (кг);Влажность %;Сорная примесь %;Кислотное число;Масличная примесь %;Массовая доля масла %;Базовая цена;Скидка %;Цена за кг;Сумма\n';
+            
+            calculations.forEach(calc => {
+                csv += `${new Date(calc.date).toLocaleDateString('ru-RU')};`;
+                csv += `${calc.recipientName};`;
+                csv += `${calc.vehicleNumber};`;
+                csv += `${calc.weight};`;
+                csv += `${calc.moisture};`;
+                csv += `${calc.impurity};`;
+                csv += `${calc.acidNumber};`;
+                csv += `${calc.oilImpurity};`;
+                csv += `${calc.oilContent};`;
+                csv += `${calc.basePrice.toFixed(2)};`;
+                csv += `${calc.totalDiscount.toFixed(2)};`;
+                csv += `${calc.finalPricePerKg.toFixed(2)};`;
+                csv += `${calc.totalCost.toFixed(2)}\n`;
+            });
+
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `zakupka_podsolnechnika_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        function displayRecipients() {
+            const recipientsList = document.getElementById('recipientsList');
+            let html = '';
+
+            for (let key in recipients) {
+                const r = recipients[key];
+                html += `
+                    <div class="recipient-info" style="display: block; margin-bottom: 20px;">
+                        <h4>${r.name}</h4>
+                        <p><strong>ИНН:</strong> ${r.inn}</p>
+                        <p><strong>Адрес:</strong> ${r.address}</p>
+                        <p><strong>ЖД станция:</strong> ${r.station}</p>
+                        ${r.restrictions ? `<p style="color: #d32f2f; margin-top: 10px;"><strong>⚠️ Ограничения:</strong> ${r.restrictions}</p>` : ''}
+                    </div>
+                `;
+            }
+
+            recipientsList.innerHTML = html;
+        }
+
+        function displayStats() {
+            const totalCalc = calculations.length;
+            const totalW = calculations.reduce((sum, c) => sum + c.weight, 0);
+            const totalA = calculations.reduce((sum, c) => sum + c.totalCost, 0);
+
+            document.getElementById('totalCalculations').textContent = totalCalc;
+            document.getElementById('totalWeight').textContent = (totalW / 1000).toFixed(2);
+            document.getElementById('totalAmount').textContent = totalA.toLocaleString('ru-RU', {maximumFractionDigits: 0});
+
+            if (totalCalc > 0) {
+                const avgMoisture = calculations.reduce((sum, c) => sum + c.moisture, 0) / totalCalc;
+                const avgImpurity = calculations.reduce((sum, c) => sum + c.impurity, 0) / totalCalc;
+                const avgAcid = calculations.reduce((sum, c) => sum + c.acidNumber, 0) / totalCalc;
+                const avgOilContent = calculations.reduce((sum, c) => sum + c.oilContent, 0) / totalCalc;
+                const avgDiscount = calculations.reduce((sum, c) => sum + c.totalDiscount, 0) / totalCalc;
+
+                const avgQuality = document.getElementById('avgQuality');
+                avgQuality.innerHTML = `
+                    <table>
+                        <tr>
+                            <th>Показатель</th>
+                            <th>Среднее значение</th>
+                            <th>Базисная норма</th>
+                        </tr>
+                        <tr>
+                            <td>Влажность</td>
+                            <td>${avgMoisture.toFixed(2)}%</td>
+                            <td>8.0%</td>
+                        </tr>
+                        <tr>
+                            <td>Сорная примесь</td>
+                            <td>${avgImpurity.toFixed(2)}%</td>
+                            <td>3.0%</td>
+                        </tr>
+                        <tr>
+                            <td>Кислотное число</td>
+                            <td>${avgAcid.toFixed(2)} мг КОН/г</td>
+                            <td>3.0 мг КОН/г</td>
+                        </tr>
+                        <tr>
+                            <td>Массовая доля масла</td>
+                            <td>${avgOilContent.toFixed(2)}%</td>
+                            <td>45.0%</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td>Средняя скидка</td>
+                            <td>${avgDiscount.toFixed(2)}%</td>
+                            <td>--</td>
+                        </tr>
+                    </table>
+                `;
+            } else {
+                document.getElementById('avgQuality').innerHTML = '<p style="text-align: center; color: #999;">Нет данных для отображения статистики</p>';
+            }
+        }
+    </script>
+</body>
+</html>
